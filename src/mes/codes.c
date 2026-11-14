@@ -1068,6 +1068,115 @@ struct mes_code_tables nonomura_tables = {
 };
 
 // }}} nonomura byouin
+// {{{ hana to hebi
+// Same script format as Nonomura Byouin, different system variable layout
+// (determined from HH2D.exe: mem16 offsets 0x20b8 + i*2 / 0x2154 + i*4).
+
+#define HANAHEBI_SYSVAR16_TO_INT { \
+	[MES_SYS_VAR_HEAP] = 0, \
+	[MES_SYS_VAR_DST_SURFACE] = 1, \
+	[MES_SYS_VAR_FLAGS] = 2, \
+	[MES_SYS_VAR_CURSOR_X] = 3, \
+	[MES_SYS_VAR_CURSOR_Y] = 4, \
+	[MES_SYS_VAR_TEXT_START_X] = 5, \
+	[MES_SYS_VAR_TEXT_START_Y] = 6, \
+	[MES_SYS_VAR_TEXT_END_X] = 7, \
+	[MES_SYS_VAR_TEXT_END_Y] = 8, \
+	[MES_SYS_VAR_TEXT_CURSOR_X] = 9, \
+	[MES_SYS_VAR_TEXT_CURSOR_Y] = 10, \
+	[MES_SYS_VAR_FONT_WEIGHT] = 11, \
+	[MES_SYS_VAR_FONT_WIDTH] = 12, \
+	[MES_SYS_VAR_FONT_HEIGHT] = 13, \
+	[MES_SYS_VAR_DISPLAY_NUMBER_FLAGS] = 14, \
+	[MES_SYS_VAR_CHAR_SPACE] = 15, \
+	[MES_SYS_VAR_LINE_SPACE] = 16, \
+	[MES_SYS_VAR_CG_X] = 17, \
+	[MES_SYS_VAR_CG_Y] = 18, \
+	[MES_SYS_VAR_CG_W] = 19, \
+	[MES_SYS_VAR_CG_H] = 20, \
+	[MES_SYS_VAR_BG_COLOR] = 21, \
+	[MES_SYS_VAR_FG_COLOR] = 22, \
+	[MES_SYS_VAR_MASK_COLOR] = 23, \
+	[MES_SYS_VAR_NR_MENU_ENTRIES] = 24, \
+	[MES_SYS_VAR_MENU_NO] = 25, \
+}
+
+#define HANAHEBI_INT_TO_SYSVAR16 { \
+	[0]  = MES_SYS_VAR_HEAP, \
+	[1]  = MES_SYS_VAR_DST_SURFACE, \
+	[2]  = MES_SYS_VAR_FLAGS, \
+	[3]  = MES_SYS_VAR_CURSOR_X, \
+	[4]  = MES_SYS_VAR_CURSOR_Y, \
+	[5]  = MES_SYS_VAR_TEXT_START_X, \
+	[6]  = MES_SYS_VAR_TEXT_START_Y, \
+	[7]  = MES_SYS_VAR_TEXT_END_X, \
+	[8]  = MES_SYS_VAR_TEXT_END_Y, \
+	[9]  = MES_SYS_VAR_TEXT_CURSOR_X, \
+	[10] = MES_SYS_VAR_TEXT_CURSOR_Y, \
+	[11] = MES_SYS_VAR_FONT_WEIGHT, \
+	[12] = MES_SYS_VAR_FONT_WIDTH, \
+	[13] = MES_SYS_VAR_FONT_HEIGHT, \
+	[14] = MES_SYS_VAR_DISPLAY_NUMBER_FLAGS, \
+	[15] = MES_SYS_VAR_CHAR_SPACE, \
+	[16] = MES_SYS_VAR_LINE_SPACE, \
+	[17] = MES_SYS_VAR_CG_X, \
+	[18] = MES_SYS_VAR_CG_Y, \
+	[19] = MES_SYS_VAR_CG_W, \
+	[20] = MES_SYS_VAR_CG_H, \
+	[21] = MES_SYS_VAR_BG_COLOR, \
+	[22] = MES_SYS_VAR_FG_COLOR, \
+	[23] = MES_SYS_VAR_MASK_COLOR, \
+	[24] = MES_SYS_VAR_NR_MENU_ENTRIES, \
+	[25] = MES_SYS_VAR_MENU_NO, \
+	[26] = MES_CODE_INVALID, \
+	[27] = MES_CODE_INVALID, \
+}
+
+#define HANAHEBI_SYSVAR32_TO_INT { \
+	[MES_SYS_VAR_MEMORY] = 0, \
+	[MES_SYS_VAR_CG_OFFSET] = 1, \
+	[MES_SYS_VAR_DATA_OFFSET] = 2, \
+	[MES_SYS_VAR_MPX_OFFSET] = 3, \
+	[MES_SYS_VAR_CCD_OFFSET] = 4, \
+	[MES_SYS_VAR_EVE_OFFSET] = 5, \
+	[MES_SYS_VAR_PALETTE] = MES_CODE_INVALID, \
+	[MES_SYS_VAR_A6_OFFSET] = 6, \
+	[MES_SYS_VAR_FILE_DATA] = 7, \
+	[MES_SYS_VAR_MENU_ENTRY_ADDRESSES] = 8, \
+	[MES_SYS_VAR_MASK_COLOR24] = 9, \
+	[MES_SYS_VAR_MAP_DATA] = 10, \
+	[MES_SYS_VAR_MENU_ENTRY_NUMBERS] = 11, \
+}
+
+#define HANAHEBI_INT_TO_SYSVAR32 { \
+	[0]  = MES_SYS_VAR_MEMORY, \
+	[1]  = MES_SYS_VAR_CG_OFFSET, \
+	[2]  = MES_SYS_VAR_DATA_OFFSET, \
+	[3]  = MES_SYS_VAR_MPX_OFFSET, \
+	[4]  = MES_SYS_VAR_CCD_OFFSET, \
+	[5]  = MES_SYS_VAR_EVE_OFFSET, \
+	[6]  = MES_SYS_VAR_A6_OFFSET, \
+	[7]  = MES_SYS_VAR_FILE_DATA, \
+	[8]  = MES_SYS_VAR_MENU_ENTRY_ADDRESSES, \
+	[9]  = MES_SYS_VAR_MASK_COLOR24, \
+	[10] = MES_SYS_VAR_MAP_DATA, \
+	[11] = MES_SYS_VAR_MENU_ENTRY_NUMBERS, \
+	[12 ... 27] = MES_CODE_INVALID, \
+}
+
+struct mes_code_tables hanahebi_tables = {
+	.stmt_op_to_int = NONOMURA_STMT_OP_TO_INT,
+	.int_to_stmt_op = NONOMURA_INT_TO_STMT_OP,
+	.expr_op_to_int = NONOMURA_EXPR_OP_TO_INT,
+	.int_to_expr_op = NONOMURA_INT_TO_EXPR_OP,
+	.sysvar16_to_int = HANAHEBI_SYSVAR16_TO_INT,
+	.int_to_sysvar16 = HANAHEBI_INT_TO_SYSVAR16,
+	.sysvar32_to_int = HANAHEBI_SYSVAR32_TO_INT,
+	.int_to_sysvar32 = HANAHEBI_INT_TO_SYSVAR32,
+	.system = &mes_sys_none,
+	.util = &mes_util_none,
+};
+// }}} hana to hebi
 
 struct mes_code_tables mes_code_tables = {
 	.stmt_op_to_int = DEFAULT_STMT_OP_TO_INT,
@@ -1104,8 +1213,9 @@ static struct mes_code_tables *get_code_tables(enum ai5_game_id id)
 	case GAME_KAWARAZAKIKE:
 		return &kawarazakike_tables;
 	case GAME_NONOMURA:
-	case GAME_HANAHEBI:
 		return &nonomura_tables;
+	case GAME_HANAHEBI:
+		return &hanahebi_tables;
 	default:
 		return &default_tables;
 	}
