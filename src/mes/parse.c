@@ -279,13 +279,16 @@ static bool in_range(int v, int low, int high)
 	return v >= low && v <= high;
 }
 
+bool mes_text_cp949 = false;
 bool mes_char_is_hankaku(uint8_t b)
 {
+	if (mes_text_cp949) return b < 0x80;
 	return !in_range(b, 0x81, 0x9f) && !in_range(b, 0xe0, 0xef);
 }
 
 bool mes_char_is_zenkaku(uint8_t b)
 {
+	if (mes_text_cp949) return b >= 0x81 && b <= 0xfe;
 	return in_range(b, 0x81, 0x9f) || in_range(b, 0xe0, 0xef) || in_range(b, 0xfa, 0xfc);
 }
 
@@ -302,6 +305,16 @@ static string mes_parse_txt(struct buffer *mes, bool *terminated)
 		if (unlikely(str_i >= (TXT_BUF_SIZE - 7))) {
 			DC_ERROR(mes->index, "TXT buffer overflow");
 			return NULL;
+		}
+		if (mes_text_cp949 && c >= 0x20 && c < 0x7f) {
+			// CP949 translations mix ASCII (spaces etc.) into TXT
+			str[str_i++] = buffer_read_u8(mes);
+			continue;
+		}
+		if (mes_text_cp949 && mes_char_is_zenkaku(c)) {
+			str[str_i++] = buffer_read_u8(mes);
+			str[str_i++] = buffer_read_u8(mes);
+			continue;
 		}
 		if (unlikely(!mes_char_is_zenkaku(c))) {
 			DC_WARNING(mes->index, "Invalid byte in TXT statement: %02x", (unsigned)c);
@@ -335,6 +348,12 @@ static string mes_parse_str(struct buffer *mes, bool *terminated)
 		if (unlikely(str_i >= (TXT_BUF_SIZE - 5))) {
 			DC_ERROR(mes->index, "STR buffer overflow");
 			return NULL;
+		}
+		if (mes_text_cp949 && c >= 0x81 && c <= 0xfe) {
+			// CP949 translations put 2-byte characters in STR
+			str_i += sprintf(str+str_i, "\\x%02x", buffer_read_u8(mes));
+			str_i += sprintf(str+str_i, "\\x%02x", buffer_read_u8(mes));
+			continue;
 		}
 		if (unlikely(!mes_char_is_hankaku(c))) {
 			DC_WARNING(mes->index, "Invalid byte in STR statement: %02x", (unsigned)c);

@@ -528,6 +528,9 @@ struct mes_statement {
 };
 
 /* parse.c */
+// Set to true for Korean fan translations which store script text in CP949.
+// TXT/STR statements may then contain CP949 2-byte characters mixed with ASCII.
+extern bool mes_text_cp949;
 bool mes_char_is_hankaku(uint8_t b);
 bool mes_char_is_zenkaku(uint8_t b);
 
