@@ -485,7 +485,7 @@ static struct mes_statement *_mes_parse_statement(struct buffer *mes)
 		stmt->DEF_PROC.skip_addr = buffer_read_u32(mes);
 		break;
 	case MES_STMT_MENU_EXEC:
-		if (ai5_target_game == GAME_NONOMURA) {
+		if (game_is_nonomura_vm()) {
 			if (!mes_parse_parameter_list(mes, &stmt->DEF_MENU.params))
 				goto error;
 		}
@@ -591,7 +591,7 @@ bool mes_parse_statements(uint8_t *data, size_t data_size, mes_statement_list *s
 		return aiw_mes_parse_statements(data, data_size, statements);
 
 	// TODO: read this?
-	if (ai5_target_game == GAME_NONOMURA) {
+	if (game_is_nonomura_vm()) {
 		// address table
 		if (data_size < 4)
 			return false;
@@ -718,7 +718,7 @@ void mes_statement_free(struct mes_statement *stmt)
 	case MES_STMT_1F:
 		break;
 	case MES_STMT_MENU_EXEC:
-		if (ai5_target_game == GAME_NONOMURA)
+		if (game_is_nonomura_vm())
 			mes_parameter_list_free(stmt->DEF_MENU.params);
 		break;
 	case MES_STMT_18:

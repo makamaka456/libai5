@@ -623,7 +623,7 @@ void _mes_statement_print(struct mes_statement *stmt, struct port *out, int inde
 		break;
 	case MES_STMT_MENU_EXEC:
 		port_puts(out, "menuexec");
-		if (ai5_target_game == GAME_NONOMURA) {
+		if (game_is_nonomura_vm()) {
 			mes_parameter_list_print(stmt->DEF_MENU.params, out);
 		}
 		port_puts(out, ";\n");

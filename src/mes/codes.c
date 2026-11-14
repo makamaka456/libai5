@@ -1104,6 +1104,7 @@ static struct mes_code_tables *get_code_tables(enum ai5_game_id id)
 	case GAME_KAWARAZAKIKE:
 		return &kawarazakike_tables;
 	case GAME_NONOMURA:
+	case GAME_HANAHEBI:
 		return &nonomura_tables;
 	default:
 		return &default_tables;

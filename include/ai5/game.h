@@ -22,6 +22,7 @@
 enum ai5_game_id {
 	GAME_KISAKU_ANIM,    // 2011-04-28 release (animated complete edition)
 	GAME_DOUKYUUSEI2_DL, // 2007-07-06 release
+	GAME_HANAHEBI,       // 2005-07-29 release (Korean fan translation supported)
 	GAME_KAWARAZAKIKE,   // 2003-10-24 release (AIWIN engine)
 	GAME_NONOMURA,       // 2003-10-24 release
 	GAME_KISAKU,         // 2001-09-28 release (DVD-ROM edition)
@@ -59,6 +60,12 @@ static inline bool game_is_aiwin(void)
 	default:
 		return false;
 	}
+}
+
+// games using the Nonomura Byouin (2003) script format
+static inline bool game_is_nonomura_vm(void)
+{
+	return ai5_target_game == GAME_NONOMURA || ai5_target_game == GAME_HANAHEBI;
 }
 
 extern struct ai5_game ai5_games[AI5_NR_GAME_IDS];

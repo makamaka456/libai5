@@ -29,6 +29,7 @@ struct ai5_game ai5_games[] = {
 	{ "doukyuusei",     GAME_DOUKYUUSEI,     "同級生 Windows版" },
 	{ "doukyuusei2",    GAME_DOUKYUUSEI2,    "同級生２" },
 	{ "doukyuusei2-dl", GAME_DOUKYUUSEI2_DL, "同級生２ ＤＬ版" },
+	{ "hanahebi",       GAME_HANAHEBI,       "花と蛇" },
 	{ "isaku",          GAME_ISAKU,          "遺作 リニューアル" },
 	{ "kakyuusei",      GAME_KAKYUUSEI,      "下級生" },
 	{ "kawarazakike",   GAME_KAWARAZAKIKE,   "河原崎家の一族" },
