@@ -691,6 +691,39 @@ static uint8_t *pack_wav(uint8_t *data_in, size_t size_in, size_t *size_out, boo
 }
 
 /*
+ * IMA ADPCM (WAVE_FORMAT_IMA_ADPCM = 0x11): Shuusaku's VOICE.AWD (CD version).
+ * Format as set up by AIWIN.EXE: mono, 22050 Hz, 512-byte blocks,
+ * 1017 samples per block.
+ */
+static uint8_t *pack_wav_ima_adpcm(uint8_t *data_in, size_t size_in, size_t *size_out)
+{
+	const unsigned hdr = 12 + 8 + 20 + 8 + 4 + 8;
+	uint8_t *data = xmalloc(size_in + hdr);
+	unsigned blocks = size_in / 512;
+	memcpy(data, "RIFF", 4);
+	le_put32(data, 4, size_in + hdr - 8);
+	memcpy(data + 8, "WAVE", 4);
+	memcpy(data + 12, "fmt ", 4);
+	le_put32(data, 16, 20);
+	le_put16(data, 20, 0x11);   // IMA ADPCM
+	le_put16(data, 22, 1);      // channels
+	le_put32(data, 24, 22050);  // frequency
+	le_put32(data, 28, 11100);  // bytes per second
+	le_put16(data, 32, 512);    // block align
+	le_put16(data, 34, 4);      // bits per sample
+	le_put16(data, 36, 2);      // extra size
+	le_put16(data, 38, 1017);   // samples per block
+	memcpy(data + 40, "fact", 4);
+	le_put32(data, 44, 4);
+	le_put32(data, 48, blocks * 1017);
+	memcpy(data + 52, "data", 4);
+	le_put32(data, 56, size_in);
+	memcpy(data + hdr, data_in, size_in);
+	*size_out = size_in + hdr;
+	return data;
+}
+
+/*
  * Decompress compressed file types.
  */
 static bool data_decompress(struct archive_data *file)
@@ -704,6 +737,8 @@ static bool data_decompress(struct archive_data *file)
 			// raw s16le PCM data: convert to WAV
 			bool stereo = file->archive->flags & ARCHIVE_STEREO;
 			data = pack_wav(file->data, file->raw_size, &data_size, stereo);
+		} else if (file->meta.type == AWD_IMA_ADPCM) {
+			data = pack_wav_ima_adpcm(file->data, file->raw_size, &data_size);
 		} else {
 			// mp3: do nothing
 			if (file->meta.type != AWD_MP3)

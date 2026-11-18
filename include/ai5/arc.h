@@ -93,6 +93,7 @@ struct archive {
 
 enum awd_file_type {
 	AWD_PCM = 1,
+	AWD_IMA_ADPCM = 17,
 	AWD_MP3 = 85,
 };
 
