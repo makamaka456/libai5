@@ -347,18 +347,28 @@ static bool read_index(FILE *fp, struct archive *arc,
 	// read file entries
 	vector_init(arc->files);
 	vector_resize(struct archive_data, arc->files, arc->meta.nr_files);
+	// a broken entry (e.g. data cut off at the end of the file: Shuusaku
+	// BGM.AWD copies exist with the last track missing) is skipped; the
+	// rest of the archive stays usable
+	int nr_ok = 0;
 	for (int i = 0; i < arc->meta.nr_files; i++, buf_pos += arc->meta.entry_size) {
-		struct archive_data *file = &vector_A(arc->files, i);
+		struct archive_data *file = &vector_A(arc->files, nr_ok);
 		*file = (struct archive_data){0};
 		if (!read_entry(arc, file, buf + buf_pos)) {
-			WARNING("Failed to read archive entry %d", i);
-			vector_destroy(arc->files);
-			vector_init(arc->files);
-			free(buf);
-			return false;
+			WARNING("Failed to read archive entry %d (skipped)", i);
+			continue;
 		}
 		file->archive = arc;
+		nr_ok++;
 	}
+	if (nr_ok == 0 && arc->meta.nr_files > 0) {
+		vector_destroy(arc->files);
+		vector_init(arc->files);
+		free(buf);
+		return false;
+	}
+	vector_resize(struct archive_data, arc->files, nr_ok);
+	arc->meta.nr_files = nr_ok;
 
 	free(buf);
 	create_index(arc);
