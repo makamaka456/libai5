@@ -366,9 +366,13 @@ struct cg *gcc_decode(uint8_t *data, size_t size)
 		} else if (cg->metrics.y + cg->metrics.h > alpha_h) {
 			WARNING("alpha height is too small");
 		} else {
+			// both are stored bottom-up; the mask covers rows 0..alpha_h-1
+			// of the canvas, the color rows y..y+h-1: skip the mask rows
+			// below the picture (e.g. Hana to Hebi mini01.gcc: 6 rows)
+			unsigned skip = alpha_h - (cg->metrics.y + cg->metrics.h);
 			for (int row = 0; row < cg->metrics.h; row++) {
 				int dst_row = cg->metrics.h - (row + 1);
-				uint8_t *src = alpha + cg->metrics.x + row * alpha_w;
+				uint8_t *src = alpha + cg->metrics.x + (row + skip) * alpha_w;
 				uint8_t *dst = cg->pixels + dst_row * cg->metrics.w * 4;
 				for (int col = 0; col < cg->metrics.w; col++, src++, dst += 4) {
 					dst[3] = *src;
